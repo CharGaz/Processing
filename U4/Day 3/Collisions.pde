@@ -2,6 +2,7 @@ PVector posCue, posRed; //Positions of the cue ball and red ball
 PVector v, w;           //Velocities of the cue ball and red ball
 float radius, diam;
 
+
 void setup() {
   size(700, 700);
   //background(0,155,0);
