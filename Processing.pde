@@ -1,9 +1,5 @@
 import processing.sound.*;
 import g4p_controls.*;
-//SoundFile benzi_box;
-
-
-
 
 
 boolean playSong = false;
@@ -12,7 +8,7 @@ boolean playStatus = false; //Stops the terminal from being filled with messages
 ArrayList<Song> playList1 = new ArrayList<Song>();
 int songIndex = 0;
 void setup(){
-    size(800,800);
+    size(1200,600);
     background(0);
     playList1.add(new Song(this,"Benzi Box.mp3","The Mouse and The Mask", "Mouse and the Mask.jpeg"));
     playList1.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
