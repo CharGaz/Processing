@@ -19,6 +19,7 @@ void setup(){
     playList1.add(new Song(this,"Benzi Box.mp3","hi", "Mouse and the Mask.jpeg"));
     playList1.add(new Song(this, "Darling I.mp3","hello","Chromakopia Album.jpeg" ));
     playList1.add(new Song(this,"St Chroma.mp3","greetings","Chromakopia Album.jpeg"));
+    playList1.add(new Song(this, "Doomsday.mp3", "welcom","Operation Doomsday Album Cover.jpeg" ));
     
     createGUI();
     
@@ -36,4 +37,18 @@ void draw(){
     }
     
     
+}
+
+void shufflePlaylist(ArrayList<Song> playlist){
+    if(playList1.size() < 2){
+        return;
+    }
+
+    for(int i = playlist.size() - 1; i > 0; i-- ){
+        int j = int(random(i+1)); //Random index from 1 - the size of the playlist
+        Song temp = playlist.get(i);
+        playlist.set(i, playlist.get(j));
+        playlist.set(j,temp);
+    }
+
 }
