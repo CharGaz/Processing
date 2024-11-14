@@ -14,46 +14,54 @@
  * =========================================================
  */
 
-synchronized public void win_draw4(PApplet appc, GWinData data) { //_CODE_:hello:248823:
-  appc.background(230);
-} //_CODE_:hello:248823:
-
-public void Pause_clicked(GButton source, GEvent event) { //_CODE_:p:482261:
-  playSong = false;
-} //_CODE_:p:482261:
-
-public void Play_clicked(GButton source, GEvent event) { //_CODE_:Play:869780:
+public void playClicked(GImageButton source, GEvent event) { //_CODE_:play_button:242900:
   playSong = true;
-} //_CODE_:Play:869780:
+  displayPlay = false;
+} 
 
-public void shuffle_clicked(GButton source, GEvent event) { //_CODE_:shuffle:526257:
-  if(playList1.get(songIndex).song.isPlaying()){
-    playList1.get(songIndex).stopSong();
+public void pauseClicked(GImageButton source, GEvent event) { //_CODE_:pause_button:527890:
+  playSong = false;
+  displayPlay = true;
+} 
+
+public void fastfowardClicked(GImageButton source, GEvent event) { //_CODE_:fast_foward_button:334872:
+  playlist.get(songIndex).stopSong();
+  songIndex = (songIndex + 1) % playlist.size();
+  playStatus = false;
+} //_CODE_:fast_foward_button:334872:
+
+public void rewindClicked(GImageButton source, GEvent event) { //_CODE_:rewind_button:710650:
+  playlist.get(songIndex).stopSong();
+  songIndex = (songIndex-1 + playlist.size()) % playlist.size();
+  playStatus = false;
+} 
+
+public void loopClicked(GImageButton source, GEvent event) { //_CODE_:loop_button:237365:
+  println("loop_button - GImageButton >> GEvent." + event + " @ " + millis());
+} 
+
+public void shuffleClicked(GImageButton source, GEvent event) { //_CODE_:shuff_button:228625:
+  if(playlist.get(songIndex).song.isPlaying()){
+    playlist.get(songIndex).stopSong();
   }
 
-  shufflePlaylist(playList1);
+  shufflePlaylist(playlist);
   songIndex = 0;
 
   playStatus = false;
   playSong = true;
-} //_CODE_:shuffle:526257:
+  displayPlay = false;
+  
 
-public void skip_cliked(GButton source, GEvent event) { //_CODE_:skip:211431:
-  playList1.get(songIndex).stopSong();
-  songIndex = (songIndex + 1) % playList1.size();
-  playStatus = false;
-} //_CODE_:skip:211431:
+} 
 
-public void replay_clicked(GButton source, GEvent event) { //_CODE_:replay:953897:
-  playList1.get(songIndex).stopSong();
-  if(songIndex-1 != -1){
-    songIndex = (songIndex-1) % playList1.size();
-    playStatus = false;
-  }
-  else{
-    println("cannot replay");
-  }
-} //_CODE_:replay:953897:
+public void speedChanged(GSlider source, GEvent event) { //_CODE_:speed_slider:867952:
+  println("speed_slider - GSlider >> GEvent." + event + " @ " + millis());
+} //_CODE_:speed_slider:867952:
+
+public void volumeChanged(GSlider source, GEvent event) { //_CODE_:volume:779657:
+  println("volume - GSlider >> GEvent." + event + " @ " + millis());
+} //_CODE_:volume:779657:
 
 
 
@@ -64,33 +72,48 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Sketch Window");
-  hello = GWindow.getWindow(this, "Window titl", 0, 0, 240, 200, JAVA2D);
-  hello.noLoop();
-  hello.setActionOnClose(G4P.KEEP_OPEN);
-  hello.addDrawHandler(this, "win_draw4");
-  p = new GButton(hello, 4, 5, 80, 30);
-  p.setText("Pause");
-  p.addEventHandler(this, "Pause_clicked");
-  Play = new GButton(hello, 97, 5, 80, 30);
-  Play.setText("Play");
-  Play.addEventHandler(this, "Play_clicked");
-  shuffle = new GButton(hello, 4, 45, 80, 30);
-  shuffle.setText("Shuffle");
-  shuffle.addEventHandler(this, "shuffle_clicked");
-  skip = new GButton(hello, 97, 45, 80, 30);
-  skip.setText("Skip");
-  skip.addEventHandler(this, "skip_cliked");
-  replay = new GButton(hello, 5, 86, 80, 30);
-  replay.setText("Prevoius Song");
-  replay.addEventHandler(this, "replay_clicked");
-  hello.loop();
+  play_button = new GImageButton(this, 400, 500, 100, 60, new String[] { "Black Play Button.png", "Black Play Button.png", "Black Play Button.png" } );
+  play_button.addEventHandler(this, "playClicked");
+  pause_button = new GImageButton(this, 375, 381, 100, 60, new String[] { "Black Pause Button.png", "Black Pause Button.png", "Black Pause Button.png" } );
+  pause_button.addEventHandler(this, "pauseClicked");
+  fast_foward_button = new GImageButton(this, 503, 293, 100, 60, new String[] { "Fast Forward Button.png", "Fast Forward Button.png", "Fast Forward Button.png" } );
+  fast_foward_button.addEventHandler(this, "fastfowardClicked");
+  rewind_button = new GImageButton(this, 361, 277, 100, 60, new String[] { "Rewind Button.png", "Rewind Button.png", "Rewind Button.png" } );
+  rewind_button.addEventHandler(this, "rewindClicked");
+  loop_button = new GImageButton(this, 227, 360, 100, 60, new String[] { "shuffle.png", "shuffle.png", "shuffle.png" } );
+  loop_button.addEventHandler(this, "loopClicked");
+  shuff_button = new GImageButton(this, 224, 458, 100, 60, new String[] { "shuffle.png", "shuffle.png", "shuffle.png" } );
+  shuff_button.addEventHandler(this, "shuffleClicked");
+  speed_slider = new GSlider(this, 515, 458, 100, 50, 10.0);
+  speed_slider.setShowValue(true);
+  speed_slider.setShowLimits(true);
+  speed_slider.setLimits(1.0, 0.2, 2.0);
+  speed_slider.setNbrTicks(7);
+  speed_slider.setStickToTicks(true);
+  speed_slider.setShowTicks(true);
+  speed_slider.setNumberFormat(G4P.DECIMAL, 1);
+  speed_slider.setOpaque(false);
+  speed_slider.addEventHandler(this, "speedChanged");
+  volume = new GSlider(this, 505, 383, 100, 50, 10.0);
+  volume.setShowValue(true);
+  volume.setShowLimits(true);
+  volume.setLimits(0.5, 0.0, 1.0);
+  volume.setNbrTicks(10);
+  volume.setStickToTicks(true);
+  volume.setShowTicks(true);
+  volume.setNumberFormat(G4P.DECIMAL, 2);
+  volume.setOpaque(false);
+  volume.addEventHandler(this, "volumeChanged");
 }
+
 
 // Variable declarations 
 // autogenerated do not edit
-GWindow hello;
-GButton p; 
-GButton Play; 
-GButton shuffle; 
-GButton skip; 
-GButton replay; 
+GImageButton play_button; 
+GImageButton pause_button; 
+GImageButton fast_foward_button; 
+GImageButton rewind_button; 
+GImageButton loop_button; 
+GImageButton shuff_button; 
+GSlider speed_slider; 
+GSlider volume; 
