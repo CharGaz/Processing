@@ -24,17 +24,29 @@ public class Processing extends PApplet {
 boolean playSong = false;
 boolean playStatus = false;
 boolean displayPlay = true;
+boolean isLooping = false;
+
+
 
 ArrayList<Song> playlist = new ArrayList<Song>();
 int songIndex = 0;
+int loopIndex = 1;
+
+float playBackSpeed = 1.0f;
+float setVolume = 0.9f;
+
+
+
 public void setup(){
     /* size commented out by preprocessor */;
     background(197, 211, 232);
 
-    playlist.add(new Song(this,"Benzi Box.mp3","hi", "Mouse and the Mask.jpeg"));
-    playlist.add(new Song(this, "Darling I.mp3","hello","Chromakopia Album.jpeg" ));
-    playlist.add(new Song(this,"St Chroma.mp3","greetings","Chromakopia Album.jpeg"));
-    playlist.add(new Song(this, "Doomsday.mp3", "welcom","Operation Doomsday Album Cover.jpeg" ));
+    playlist.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
+    playlist.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
+    playlist.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
+    playlist.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+    playlist.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+
     
     createGUI();
 }
@@ -43,12 +55,27 @@ public void draw(){
   background(197, 211, 232);
   drawUI();
 
-  playlist.get(songIndex).playSong();
+  if(playlist.size() > 0){
+      playlist.get(songIndex).displayInfo(this);
+    }
 
+  
+
+  playlist.get(songIndex).playSong(playBackSpeed, setVolume); //Putting the playback speed and volume into the song class
+  
   if(!playlist.get(songIndex).song.isPlaying() && playStatus){
     playStatus = false;
-    songIndex = (songIndex + 1) % playlist.size();
+    if(!isLooping){
+      songIndex = (songIndex + 1) % playlist.size();
+    }
+
+    else{
+      songIndex = songIndex % playlist.size();
+    }
+    
   }
+
+
 }
 
 public void drawUI(){
@@ -58,15 +85,23 @@ public void drawUI(){
   rect(0, 0, 200, height);
   
   // bottom frame
-  rect(200, height - 150, width, height - 150);
+  rect(200, height - 150, 925, height - 150);
+
+  //right frame
+  fill(208,232,197);
+  strokeWeight(0);
+  rect(925,0, width, height);
   
   // divisor lines
   stroke(166, 174, 191);
   fill(166, 174, 191);
   strokeWeight(2);
   rect(200, 0, 5, height);    // left line
-  rect(205, height - 150, width, 5);    // bottom line
+  rect(205, height - 150, 723, 5);    // bottom line
+  rect(925, 0, 5, height); //right line
+  rect(925,300, width, 5); // right panal divisor
   
+  //Having either play or pause button on the screen at one given time
   if(displayPlay){
     play_button.setVisible(true);
     pause_button.setVisible(false);
@@ -74,6 +109,19 @@ public void drawUI(){
   else{
     play_button.setVisible(false);
     pause_button.setVisible(true);
+  }
+
+
+  //Changing the loop button from black(off) to white(on)
+  if((loopIndex % 2) == 0){
+    loop_button.setVisible(false);
+    loop_buttonWhite.setVisible(true);
+  }
+
+  else{
+    loop_button.setVisible(true);
+    loop_buttonWhite.setVisible(false);
+
   }
   
 }
@@ -100,19 +148,43 @@ class Song{
     //CONSTRUCTOR
     Song(PApplet sketch, String n, String a, String aw){
         this.name = n;
-        this.album = album;
+        this.album = a;
         this.artWork = aw;
         this.song = new SoundFile(sketch, n, false);
         this.cover = sketch.loadImage(aw);
     }
 
-    public void playSong(){
+    public void displayInfo(PApplet sketch){
+        
+        fill(0);
+        textSize(20);
+        sketch.text("Album: " + this.album, 935,250);
+        sketch.text("Song: " + this.name.substring(0,this.name.length()-4), 935,275);
+
+        if(cover != null){
+            sketch.image(cover, 967,25, 200,200);
+        }
+
+        else{
+            sketch.text("no album cover found", 900,200);
+        }
+
+        
+    }
+
+    public void playSong(float speed, float volume){
         if(playSong){
+
+            this.song.rate(speed);
+            this.song.amp(volume);
+
             if(!this.song.isPlaying() && !playStatus){
-                this.song.play();
                 playStatus = true;
+                this.song.play();
             }
         }
+            
+
         else if(!playSong && playStatus){
             this.song.pause();
             playStatus = false;
@@ -153,7 +225,15 @@ public void pauseClicked(GImageButton source, GEvent event) { //_CODE_:pause_but
 
 public void fastfowardClicked(GImageButton source, GEvent event) { //_CODE_:fast_foward_button:334872:
   playlist.get(songIndex).stopSong();
-  songIndex = (songIndex + 1) % playlist.size();
+  if(!isLooping){
+    songIndex = (songIndex + 1) % playlist.size();
+  }
+
+  else{
+    //playlist.get(songIndex).song.jump(0.0);
+    songIndex = (songIndex) % playlist.size();
+  }
+  
   playStatus = false;
 } //_CODE_:fast_foward_button:334872:
 
@@ -163,9 +243,29 @@ public void rewindClicked(GImageButton source, GEvent event) { //_CODE_:rewind_b
   playStatus = false;
 } 
 
-public void loopClicked(GImageButton source, GEvent event) { //_CODE_:loop_button:237365:
-  println("loop_button - GImageButton >> GEvent." + event + " @ " + millis());
+public void loopClicked(GImageButton source, GEvent event) { //Loops and unloops song
+  loopIndex += 1;
+  if((loopIndex % 2) == 0){
+    isLooping = true;
+    
+  }
+  else{
+    isLooping = false;
+  }
+  
 } 
+
+public void whiteLoopClicked(GImageButton source, GEvent event) { //Loops and unloops song
+  loopIndex += 1;
+
+  if((loopIndex % 2) == 0){
+    isLooping = true;
+  }
+  else{
+    isLooping = false;
+  }
+} 
+
 
 public void shuffleClicked(GImageButton source, GEvent event) { //_CODE_:shuff_button:228625:
   if(playlist.get(songIndex).song.isPlaying()){
@@ -183,14 +283,29 @@ public void shuffleClicked(GImageButton source, GEvent event) { //_CODE_:shuff_b
 } 
 
 public void speedChanged(GSlider source, GEvent event) { //_CODE_:speed_slider:867952:
-  println("speed_slider - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:speed_slider:867952:
+  
+  float displaySpeed = speed_slider.getValueF(); //getting values from the slider
+
+  playBackSpeed = map(displaySpeed, 0.25f,2, 0.75f, 1.25f);
+  if(playlist.get(songIndex).song.isPlaying()){
+    playlist.get(songIndex).song.rate(playBackSpeed);
+  }
+  
+} 
 
 public void volumeChanged(GSlider source, GEvent event) { //_CODE_:volume:779657:
-  println("volume - GSlider >> GEvent." + event + " @ " + millis());
-} //_CODE_:volume:779657:
+  float displayVolume = volume.getValueF();
 
+  setVolume = map(displayVolume, 0,10, 0.0f,3.0f);
 
+  if(playlist.get(songIndex).song.isPlaying()){
+    playlist.get(songIndex).song.amp(setVolume);
+  }
+} 
+
+public void dropList1_click1(GDropList source, GEvent event) { //_CODE_:dropList1:447654:
+  println("dropList1 - GDropList >> GEvent." + event + " @ " + millis());
+} //_CODE_:dropList1:447654:
 
 // Create all the GUI controls. 
 // autogenerated do not edit
@@ -199,39 +314,45 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Sketch Window");
-  play_button = new GImageButton(this, 400, 500, 100, 60, new String[] { "Black Play Button.png", "Black Play Button.png", "Black Play Button.png" } );
+  play_button = new GImageButton(this, 600, 505, 60, 50, new String[] { "Black Play Button.png", "Black Play Button.png", "Black Play Button.png" } );
   play_button.addEventHandler(this, "playClicked");
-  pause_button = new GImageButton(this, 375, 381, 100, 60, new String[] { "Black Pause Button.png", "Black Pause Button.png", "Black Pause Button.png" } );
+  pause_button = new GImageButton(this, 575, 495, 100, 70, new String[] { "Black Pause Button.png", "Black Pause Button.png", "Black Pause Button.png" } );
   pause_button.addEventHandler(this, "pauseClicked");
-  fast_foward_button = new GImageButton(this, 503, 293, 100, 60, new String[] { "Fast Forward Button.png", "Fast Forward Button.png", "Fast Forward Button.png" } );
+  fast_foward_button = new GImageButton(this, 670, 505, 60, 50, new String[] { "Fast Forward Button.png", "Fast Forward Button.png", "Fast Forward Button.png" } );
   fast_foward_button.addEventHandler(this, "fastfowardClicked");
-  rewind_button = new GImageButton(this, 361, 277, 100, 60, new String[] { "Rewind Button.png", "Rewind Button.png", "Rewind Button.png" } );
+  rewind_button = new GImageButton(this, 520, 505, 60, 50, new String[] { "Rewind Button.png", "Rewind Button.png", "Rewind Button.png" } );
   rewind_button.addEventHandler(this, "rewindClicked");
-  loop_button = new GImageButton(this, 227, 360, 100, 60, new String[] { "shuffle.png", "shuffle.png", "shuffle.png" } );
+  loop_button = new GImageButton(this, 320, 505, 100, 60, new String[] { "Black Loop Button.png","Black Loop Button.png" , "Black Loop Button.png" } );
   loop_button.addEventHandler(this, "loopClicked");
-  shuff_button = new GImageButton(this, 224, 458, 100, 60, new String[] { "shuffle.png", "shuffle.png", "shuffle.png" } );
+  loop_buttonWhite = new GImageButton(this, 320, 505, 100, 60, new String[] { "White Loop Button.png", "White Loop Button.png", "White Loop Button.png" } );
+  loop_buttonWhite.addEventHandler(this, "whiteLoopClicked");
+  shuff_button = new GImageButton(this, 420, 505, 100, 60, new String[] { "shuffle.png", "shuffle.png", "shuffle.png" } );
   shuff_button.addEventHandler(this, "shuffleClicked");
-  speed_slider = new GSlider(this, 515, 458, 100, 50, 10.0f);
+  speed_slider = new GSlider(this, 780, 480, 100, 50, 10.0f);
   speed_slider.setShowValue(true);
   speed_slider.setShowLimits(true);
   speed_slider.setLimits(1.0f, 0.2f, 2.0f);
   speed_slider.setNbrTicks(7);
-  speed_slider.setStickToTicks(true);
-  speed_slider.setShowTicks(true);
+  speed_slider.setStickToTicks(false);
+  speed_slider.setShowTicks(false);
   speed_slider.setNumberFormat(G4P.DECIMAL, 1);
   speed_slider.setOpaque(false);
   speed_slider.addEventHandler(this, "speedChanged");
-  volume = new GSlider(this, 505, 383, 100, 50, 10.0f);
+  volume = new GSlider(this, 780, 530, 100, 50, 10.0f);
   volume.setShowValue(true);
   volume.setShowLimits(true);
-  volume.setLimits(0.5f, 0.0f, 1.0f);
+  volume.setLimits(3, 0.0f, 10);
   volume.setNbrTicks(10);
-  volume.setStickToTicks(true);
-  volume.setShowTicks(true);
+  volume.setStickToTicks(false);
+  volume.setShowTicks(false);
   volume.setNumberFormat(G4P.DECIMAL, 2);
   volume.setOpaque(false);
   volume.addEventHandler(this, "volumeChanged");
+  show_playlist = new GDropList(this, 50, 100, 103, 80, 3, 10);
+  show_playlist.setItems(new String [] {"All Songs","Charlie's Songs","Lachlan's Songs"},0);
+  show_playlist.addEventHandler(this, "show_playlistClicked");
 }
+
 
 
 // Variable declarations 
@@ -244,6 +365,8 @@ GImageButton loop_button;
 GImageButton shuff_button; 
 GSlider speed_slider; 
 GSlider volume; 
+GDropList show_playlist; 
+GImageButton loop_buttonWhite; 
 
 
   public void settings() { size(1200, 600); }
