@@ -23,6 +23,7 @@ public class Processing extends PApplet {
 
 PImage soundImg;
 PImage speedImg;
+PImage logo;
 
 boolean playSong = false;
 boolean playStatus = false;
@@ -31,7 +32,13 @@ boolean isLooping = false;
 
 
 
-ArrayList<Song> playlist = new ArrayList<Song>();
+ArrayList<ArrayList<Song>> allPlaylists = new ArrayList<ArrayList<Song>>();
+ArrayList<Song> defaultPlaylist = new ArrayList<Song>();
+ArrayList<Song> playlist1 = new ArrayList<Song>();
+ArrayList<Song> playlist2 = new ArrayList<Song>();
+
+ArrayList<Song> playlist;
+
 int songIndex = 0;
 int loopIndex = 1;
 
@@ -45,19 +52,15 @@ AudioIn in;
 FFT fft;
 AudioVisualizer audioVisualizer;
 
-SoundFile currentSong;
+
 public void setup(){
   /* size commented out by preprocessor */;
   background(197, 211, 232);
-
   frameRate(120);
 
-  playlist.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
-  playlist.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
-  playlist.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
-  playlist.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
-  playlist.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
-  playlist.add(new Song(this, "Potholderz.mp3", "MM Food","MM Food.jpeg" ));
+  
+  initializePlaylists();
+  setActivePlaylist(0); //Sets the active playlist to all songs
 
   bands = 512;
   spectrum = new float[bands];
@@ -67,17 +70,16 @@ public void setup(){
     
   createGUI();
   soundImg = loadImage("Audio button.png");
-
-  if(!playlist.isEmpty()) {
-    currentSong = playlist.get(songIndex).song;
-    fft.input(currentSong); // Connect FFT to the first song
-  }
+  speedImg = loadImage("Stop Watch.png");
+  logo = loadImage("logo.png");
 }
 
 public void draw(){
   background(197, 211, 232);
   drawUI();
   image(soundImg,880,530, 48,48);
+  image(speedImg, 881, 480, 39, 39);
+  image(logo,0,0, 190,190);
   drawSongs();
   
   if(playlist.size() > 0){
@@ -95,21 +97,26 @@ public void draw(){
       songIndex = (songIndex + 1) % playlist.size();
     }
 
-    updateFFTInput();
+    
     
   }
-  
-  fft.analyze(spectrum);
   audioVisualizer.update();
-
 }
 
-public void updateFFTInput() {
-  SoundFile newSong = playlist.get(songIndex).song;
-  if(currentSong != newSong) {
-    currentSong = newSong;
-    fft.input(currentSong); // Reconnect FFT only if the song changes
-  }
+public void setActivePlaylist(int index){ //Switches between the playlists
+  if(index >= 0 && index < allPlaylists.size()){
+
+    if(playlist != null && playlist.size() > 0 && playlist.get(songIndex).song.isPlaying()){ //Stoping the song when it switches playlists
+      playlist.get(songIndex).stopSong();
+      
+    }
+    playStatus = false; // Reset play status
+    playSong = false;
+    displayPlay = true;
+
+    playlist = allPlaylists.get(index);
+    songIndex = 0; // Reset songIndex when switching playlists
+  } 
 }
 
 public void drawUI(){
@@ -134,6 +141,7 @@ public void drawUI(){
   rect(205, height - 150, 723, 5);    // bottom line
   rect(925, 0, 5, height); //right line
   rect(925,300, width, 5); // right panal divisor
+  rect(0,190, 200,5); //left panal dvisor
   
   //Having either play or pause button on the screen at one given time
   if(displayPlay){
@@ -173,13 +181,13 @@ public void drawSongs(){
     
     if(x > 900){
       x = 250; //When x reaches the end of panal, it resest to the start
-      y += 100; //When x resets, y moves down to create a new row
+      y += 75; //When x resets, y moves down to create a new row
     }
   }
 }
 
 public void shufflePlaylist(ArrayList<Song> d){
-    if(playlist.size() < 2){
+    if(d.size() < 2){
         return;
     }
 
@@ -189,11 +197,12 @@ public void shufflePlaylist(ArrayList<Song> d){
     }
 
     for(int i = d.size() - 1; i > 0; i--){
-        int j = PApplet.parseInt(random(i+1));
-        Song temp = d.get(i);
-        playlist.set(i,d.get(j));
-        playlist.set(j,temp);
+      int j = PApplet.parseInt(random(i+1));
+      Song temp = d.get(i);
+      d.set(i,d.get(j));
+      d.set(j,temp);
     }
+   
 }
 class AudioVisualizer{
   float p1, p2;    // top left and bottom right of graph
@@ -270,6 +279,56 @@ class AudioVisualizer{
     f++;
   }
 }
+public void initializePlaylists(){
+  //Adding all the songs to defult playlist
+  defaultPlaylist.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
+  defaultPlaylist.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  defaultPlaylist.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  defaultPlaylist.add(new Song(this, "Potholderz.mp3", "MM Food","MM Food.jpeg" ));
+  defaultPlaylist.add(new Song(this, "Deep Fried Frenz.mp3", "MM Food","MM Food.jpeg" ));
+  defaultPlaylist.add(new Song(this, "Crosshairs.mp3", "Mouse and the Mask","Mouse and the Mask.jpeg" ));
+  defaultPlaylist.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
+  defaultPlaylist.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
+  defaultPlaylist.add(new Song(this,"See You Again.mp3","Flower Boy","Flower Boy.jpeg"));
+  defaultPlaylist.add(new Song(this,"911: Mr lonely.mp3","Flower Boy","Flower Boy.jpeg"));
+  defaultPlaylist.add(new Song(this,"Pink White.mp3","Blonde","Blonde.jpeg"));
+  defaultPlaylist.add(new Song(this,"Goodbye Angels.mp3","The Getaway","The Getaway.jpeg"));
+  defaultPlaylist.add(new Song(this,"Sick Love.mp3","The Getaway","The Getaway.jpeg"));
+  defaultPlaylist.add(new Song(this,"White Braids & Pillow Chair.mp3","Unlimited Love","Unlimited Love.jpeg"));
+  defaultPlaylist.add(new Song(this,"Black Summer.mp3","Unlimited Love","Unlimited Love.jpeg"));
+  defaultPlaylist.add(new Song(this,"Billie Jean.mp3","Thriller","Thriller.jpeg"));
+
+
+  
+
+  //Setting up  playlist1
+  playlist1.add(new Song(this,"Potholderz.mp3", "MM Food","MM Food.jpeg" ));
+  playlist1.add(new Song(this,"Black Summer.mp3","Unlimited Love","Unlimited Love.jpeg"));
+  playlist1.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
+  playlist1.add(new Song(this,"911: Mr lonely.mp3","Flower Boy","Flower Boy.jpeg"));
+  playlist1.add(new Song(this, "Crosshairs.mp3", "Mouse and the Mask","Mouse and the Mask.jpeg" ));
+  playlist1.add(new Song(this,"Pink White.mp3","Blonde","Blonde.jpeg"));
+
+
+  //Setting up playlist2
+  playlist2.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  playlist2.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  playlist2.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
+  playlist2.add(new Song(this,"Billie Jean.mp3","Thriller","Thriller.jpeg"));
+  playlist2.add(new Song(this,"See You Again.mp3","Flower Boy","Flower Boy.jpeg"));
+  playlist2.add(new Song(this, "Crosshairs.mp3", "Mouse and the Mask","Mouse and the Mask.jpeg" ));
+  playlist2.add(new Song(this,"Goodbye Angels.mp3","The Getaway","The Getaway.jpeg"));
+  playlist2.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
+  playlist2.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
+
+
+  
+  //Adding all the playlists to 2d array
+  allPlaylists.add(defaultPlaylist);
+  allPlaylists.add(playlist1);
+  allPlaylists.add(playlist2);  
+
+}
 class Song{
     String name;
     String album; //may be temperory
@@ -282,16 +341,24 @@ class Song{
         this.name = n;
         this.album = a;
         this.artWork = aw;
-        this.song = new SoundFile(sketch, n, false);
+        this.song = new SoundFile(sketch, n);
         this.cover = sketch.loadImage(aw);
     }
 
     public void displayInfo(PApplet sketch){
-        
+        String songName = this.name.substring(0,this.name.length()-4);
+        float fontSize = 20; //base font size
+        sketch.textSize(fontSize);
+
+        while(sketch.textWidth(songName) > 215 ){ 
+            fontSize -= 0.5f; //Makes font size smaller until text fits into the rectangle
+            sketch.textSize(fontSize);
+        }
+
+        sketch.textAlign(LEFT, BASELINE);
         fill(0);
-        textSize(20);
         sketch.text("Album: " + this.album, 935,240);
-        sketch.text("Song: " + this.name.substring(0,this.name.length()-4), 935,265);
+        sketch.text("Song: " + songName, 935,265);
         sketch.text("Artist: ", 935, 290);
 
         if(cover != null){
@@ -435,6 +502,7 @@ public void shuffleClicked(GImageButton source, GEvent event) { //_CODE_:shuff_b
   playSong = true;
   displayPlay = false;
   
+  redraw();
 
 } 
 
@@ -459,8 +527,10 @@ public void volumeChanged(GSlider source, GEvent event) { //_CODE_:volume:779657
   }
 } 
 
-public void dropList1_click1(GDropList source, GEvent event) { //_CODE_:dropList1:447654:
-  println("dropList1 - GDropList >> GEvent." + event + " @ " + millis());
+public void show_playlistClicked(GDropList source, GEvent event) { //_CODE_:dropList1:447654:
+  int selectedIndex = source.getSelectedIndex();
+  println("Selected playlist index: " + selectedIndex);
+  setActivePlaylist(selectedIndex);
 } //_CODE_:dropList1:447654:
 
 // public void youtubeUrlChanged(GTextField source, GEvent event) { //_CODE_:YoutubeUrl:779815:
@@ -513,8 +583,8 @@ public void createGUI(){
   volume.setNumberFormat(G4P.DECIMAL, 2);
   volume.setOpaque(false);
   volume.addEventHandler(this, "volumeChanged");
-  show_playlist = new GDropList(this, 50, 100, 103, 80, 3, 10);
-  show_playlist.setItems(new String [] {"All Songs","Charlie's Songs","Lachlan's Songs"},0);
+  show_playlist = new GDropList(this, 30, 200, 150, 150, 3, 15);
+  show_playlist.setItems(new String [] {"All Songs","Playlist 1","Playlist 2"},0);
   show_playlist.addEventHandler(this, "show_playlistClicked");
 //   youtubeUrl = new GTextField(this, 173, 64, 120, 30, G4P.SCROLLBARS_NONE);
 //   youtubeUrl.setPromptText("Enter Url here");

@@ -80,6 +80,7 @@ public void shuffleClicked(GImageButton source, GEvent event) { //_CODE_:shuff_b
   playSong = true;
   displayPlay = false;
   
+  redraw();
 
 } 
 
@@ -104,8 +105,10 @@ public void volumeChanged(GSlider source, GEvent event) { //_CODE_:volume:779657
   }
 } 
 
-public void dropList1_click1(GDropList source, GEvent event) { //_CODE_:dropList1:447654:
-  println("dropList1 - GDropList >> GEvent." + event + " @ " + millis());
+public void show_playlistClicked(GDropList source, GEvent event) { //_CODE_:dropList1:447654:
+  int selectedIndex = source.getSelectedIndex();
+  println("Selected playlist index: " + selectedIndex);
+  setActivePlaylist(selectedIndex);
 } //_CODE_:dropList1:447654:
 
 // public void youtubeUrlChanged(GTextField source, GEvent event) { //_CODE_:YoutubeUrl:779815:
@@ -158,8 +161,8 @@ public void createGUI(){
   volume.setNumberFormat(G4P.DECIMAL, 2);
   volume.setOpaque(false);
   volume.addEventHandler(this, "volumeChanged");
-  show_playlist = new GDropList(this, 50, 100, 103, 80, 3, 10);
-  show_playlist.setItems(new String [] {"All Songs","Charlie's Songs","Lachlan's Songs"},0);
+  show_playlist = new GDropList(this, 30, 200, 150, 150, 3, 15);
+  show_playlist.setItems(new String [] {"All Songs","Playlist 1","Playlist 2"},0);
   show_playlist.addEventHandler(this, "show_playlistClicked");
 //   youtubeUrl = new GTextField(this, 173, 64, 120, 30, G4P.SCROLLBARS_NONE);
 //   youtubeUrl.setPromptText("Enter Url here");
