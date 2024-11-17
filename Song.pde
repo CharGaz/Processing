@@ -18,11 +18,12 @@ class Song{
         
         fill(0);
         textSize(20);
-        sketch.text("Album: " + this.album, 935,250);
-        sketch.text("Song: " + this.name.substring(0,this.name.length()-4), 935,275);
+        sketch.text("Album: " + this.album, 935,240);
+        sketch.text("Song: " + this.name.substring(0,this.name.length()-4), 935,265);
+        sketch.text("Artist: ", 935, 290);
 
         if(cover != null){
-            sketch.image(cover, 967,25, 200,200);
+            sketch.image(cover, 967,20, 200,200);
         }
 
         else{
@@ -35,12 +36,11 @@ class Song{
     void playSong(float speed, float volume){
         if(playSong){
 
-            this.song.rate(speed);
-            this.song.amp(volume);
+            
 
             if(!this.song.isPlaying() && !playStatus){
                 playStatus = true;
-                this.song.play();
+                this.song.play(speed,volume);
             }
         }
             
@@ -54,6 +54,30 @@ class Song{
         if(this.song.isPlaying()){
             this.song.stop();
         }
+    }
+
+    void reset(){
+        this.song.stop();
+        this.song.cue(0.0);
+    }
+
+    void printSongs(PApplet sketch, int x, int y){
+        
+        String displayName = this.name.substring(0, this.name.length()-4);
+
+        float fontSize = 16; //base font size
+        sketch.textSize(fontSize);
+
+        while(sketch.textWidth(displayName) > 105 ){ //100 is the width of the rect - the edge of rect 
+            fontSize -= 0.5; //Makes font size smaller until text fits into the rectangle
+            sketch.textSize(fontSize);
+        }
+
+        sketch.fill(0);
+        sketch.textAlign(CENTER,CENTER); //Centers text in the rectangle
+        sketch.text(displayName,x+20,y);
+
+        sketch.textAlign(LEFT, BASELINE);
     }
 
 }

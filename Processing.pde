@@ -1,6 +1,9 @@
 import processing.sound.*;
 import g4p_controls.*;
 
+PImage soundImg;
+PImage speedImg;
+
 boolean playSong = false;
 boolean playStatus = false;
 boolean displayPlay = true;
@@ -15,46 +18,63 @@ int loopIndex = 1;
 float playBackSpeed = 1.0;
 float setVolume = 0.9;
 
+// Audio Analyzer Setup
+int bands;
+float[] spectrum;
+AudioIn in;
+FFT fft;
+AudioVisualizer audioVisualizer;
 
 
 void setup(){
-    size(1200, 600);
-    background(197, 211, 232);
+  size(1200, 600);
+  background(197, 211, 232);
 
-    playlist.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
-    playlist.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
-    playlist.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
-    playlist.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
-    playlist.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  frameRate(120);
 
+  playlist.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
+  playlist.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
+  playlist.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
+  playlist.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  playlist.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  playlist.add(new Song(this, "Potholderz.mp3", "MM Food","MM Food.jpeg" ));
+
+  bands = 512;
+  spectrum = new float[bands];
+  fft = new FFT(this, bands);
+   
+  audioVisualizer = new AudioVisualizer(950, width-25);
     
-    createGUI();
+  createGUI();
+  soundImg = loadImage("Audio button.png");
 }
 
 void draw(){
   background(197, 211, 232);
   drawUI();
-
+  image(soundImg,880,530, 48,48);
+  drawSongs();
+  
   if(playlist.size() > 0){
       playlist.get(songIndex).displayInfo(this);
     }
 
   
 
-  playlist.get(songIndex).playSong(playBackSpeed, setVolume); //Putting the playback speed and volume into the song class
+   playlist.get(songIndex).playSong(playBackSpeed, setVolume);//Putting the playback speed and volume into the song class
   
   if(!playlist.get(songIndex).song.isPlaying() && playStatus){
+    
     playStatus = false;
     if(!isLooping){
       songIndex = (songIndex + 1) % playlist.size();
     }
 
-    else{
-      songIndex = songIndex % playlist.size();
-    }
+    
     
   }
-
+  
+  audioVisualizer.update();
 
 }
 
@@ -106,9 +126,32 @@ void drawUI(){
   
 }
 
+void drawSongs(){
+  int x = 250; //Setting base x and y values 
+  int y = 50;
+
+  for(int i = 0; i < playlist.size(); i++){
+    playlist.get(i).printSongs(this,x,y); //Inputs all song info into printSongs function
+    noFill();
+    strokeWeight(5);
+    rect(x-40,y-25, 125,50);
+    x += 180; //Moves x over by 200 every time
+    
+    if(x > 900){
+      x = 250; //When x reaches the end of panal, it resest to the start
+      y += 100; //When x resets, y moves down to create a new row
+    }
+  }
+}
+
 void shufflePlaylist(ArrayList<Song> d){
     if(playlist.size() < 2){
         return;
+    }
+
+    //Resets each song in playlist to make sure it starts from beginning of song 
+    for(Song song : d){
+      song.reset();
     }
 
     for(int i = d.size() - 1; i > 0; i--){
