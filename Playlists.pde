@@ -1,12 +1,12 @@
 void initializePlaylists(){
   //Adding all the songs to defult playlist
   defaultPlaylist.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
-  defaultPlaylist.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
-  defaultPlaylist.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
-  defaultPlaylist.add(new Song(this, "Potholderz.mp3", "MM Food","MM Food.jpeg" ));
-  defaultPlaylist.add(new Song(this, "Deep Fried Frenz.mp3", "MM Food","MM Food.jpeg" ));
-  defaultPlaylist.add(new Song(this, "Crosshairs.mp3", "Mouse and the Mask","Mouse and the Mask.jpeg" ));
-  defaultPlaylist.add(new Song(this, "Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
+  defaultPlaylist.add(new Song(this,"Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  defaultPlaylist.add(new Song(this,"Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  defaultPlaylist.add(new Song(this,"Potholderz.mp3", "MM Food","MM Food.jpeg" ));
+  defaultPlaylist.add(new Song(this,"Deep Fried Frenz.mp3", "MM Food","MM Food.jpeg" ));
+  defaultPlaylist.add(new Song(this,"Crosshairs.mp3", "Mouse and the Mask","Mouse and the Mask.jpeg" ));
+  defaultPlaylist.add(new Song(this,"Darling I.mp3","Chromakopia","Chromakopia Album.jpeg" ));
   defaultPlaylist.add(new Song(this,"St Chroma.mp3","Chromakopia","Chromakopia Album.jpeg"));
   defaultPlaylist.add(new Song(this,"See You Again.mp3","Flower Boy","Flower Boy.jpeg"));
   defaultPlaylist.add(new Song(this,"911: Mr lonely.mp3","Flower Boy","Flower Boy.jpeg"));
@@ -15,7 +15,7 @@ void initializePlaylists(){
   defaultPlaylist.add(new Song(this,"Sick Love.mp3","The Getaway","The Getaway.jpeg"));
   defaultPlaylist.add(new Song(this,"White Braids & Pillow Chair.mp3","Unlimited Love","Unlimited Love.jpeg"));
   defaultPlaylist.add(new Song(this,"Black Summer.mp3","Unlimited Love","Unlimited Love.jpeg"));
-  defaultPlaylist.add(new Song(this,"Billie Jean.mp3","Thriller","Thriller.jpeg"));
+  defaultPlaylist.add(new Song(this,"Billie Jean.mp3","Thriller",""));
 
 
   
@@ -30,8 +30,8 @@ void initializePlaylists(){
 
 
   //Setting up playlist2
-  playlist2.add(new Song(this, "Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
-  playlist2.add(new Song(this, "Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  playlist2.add(new Song(this,"Rhymes Like Dimes.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
+  playlist2.add(new Song(this,"Doomsday.mp3", "Operation: DOOMSDAY","Operation Doomsday Album Cover.jpeg" ));
   playlist2.add(new Song(this,"Benzi Box.mp3","Mouse and the Mask", "Mouse and the Mask.jpeg"));
   playlist2.add(new Song(this,"Billie Jean.mp3","Thriller","Thriller.jpeg"));
   playlist2.add(new Song(this,"See You Again.mp3","Flower Boy","Flower Boy.jpeg"));

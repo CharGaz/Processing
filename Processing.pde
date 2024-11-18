@@ -59,7 +59,7 @@ void draw(){
   drawUI();
   image(soundImg,880,530, 48,48);
   image(speedImg, 881, 480, 39, 39);
-  image(logo,0,0, 190,190);
+  image(logo,0,45, 190,50);
   drawSongs();
   
   if(playlist.size() > 0){
