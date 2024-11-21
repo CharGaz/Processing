@@ -1,9 +1,10 @@
 class Song{
     String name;
-    String album; //may be temperory
-    String artWork; //may be temperory
+    String album; 
+    String artWork;
+    boolean clicked;
     SoundFile song;
-    PImage cover; //Only temp if art will not be displayed
+    PImage cover; 
     PImage noCover;
 
     //CONSTRUCTOR
@@ -11,6 +12,7 @@ class Song{
         this.name = n;
         this.album = a;
         this.artWork = aw;
+        this.clicked = false;
         this.song = new SoundFile(sketch, n);
         this.cover = sketch.loadImage(aw);
         this.noCover = sketch.loadImage("Image.jpeg");
@@ -45,15 +47,11 @@ class Song{
 
     void playSong(float speed, float volume){
         if(playSong){
-
-            
-
             if(!this.song.isPlaying() && !playStatus){
                 playStatus = true;
                 this.song.play(speed,volume);
             }
-        }
-            
+        } 
 
         else if(!playSong && playStatus){
             this.song.pause();
@@ -82,8 +80,13 @@ class Song{
             fontSize -= 0.5; //Makes font size smaller until text fits into the rectangle
             sketch.textSize(fontSize);
         }
-
-        sketch.fill(0);
+        if(this.clicked && create){
+            sketch.fill(0,255,0);
+        }
+        else{
+            sketch.fill(0);
+        }
+        
         sketch.textAlign(CENTER,CENTER); //Centers text in the rectangle
         sketch.text(displayName,x+20,y);
 
