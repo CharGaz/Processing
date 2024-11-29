@@ -8,11 +8,8 @@ class Dog extends Pet{
 	}
 
 	void describe() {
-		println( this.name + " is a " + this.gender + " " + this.breed + " and is feeling " +    
-           		                      this.emoState + " today.");
+		super.describe();
+		println("I am a Dog and I am a", this.breed);
 	}
 
-	void bark() {
-		println( "'Woof!' says", this.name );
-	}
 }
