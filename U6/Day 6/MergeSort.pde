@@ -1,23 +1,15 @@
-int n = 20; //size of array
-
-void setup() {  
-  if( n > 1){
-    //making array full of random values
-    int[] a = new int[ n ];  
-    for ( int i = 0; i < a.length; i++ ){
-      a[ i ] = int(random( n*5 ));  
+void setup() {     
+    int[] a;   
+    
+    for ( int i = 0; i < a.length; i++ )  {
+        a[ i ] = int(random( n*5 ));  
     }
     
-    int[] c = mergeSort(a, 0, a.length-1);
-    
-    printArray( c ); 
-    exit();
-  }  
-  else{
-    println("Stop the tomfoolery you hooligan");
-    exit();
-  }
-  
+   
+   int[] c = mergeSort(a, 0, a.length-1);
+   
+   printArray( c ); 
+   exit();
 }
     
 int[] mergeSort( int[] a, int start, int end){
